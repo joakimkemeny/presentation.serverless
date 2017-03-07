@@ -1,0 +1,4 @@
+.bin
+.cert
+.serverless
+node_modules

@@ -1,0 +1,71 @@
+service: frontend
+
+custom:
+  bucket: "${self:service}-${opt:stage, self:provider.stage}-web"
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+resources:
+  Resources:
+
+    # Create S3 bucket to store the web application in
+    S3BucketWeb:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        BucketName: ${self:custom.bucket}
+
+    # Create S3 bucket policy to allow CloudFront to access the content
+    S3BucketPolicyWeb:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: S3BucketWeb
+        PolicyDocument:
+          Statement:
+            - Action:
+                - s3:GetObject
+              Effect: Allow
+              Principal: "*"
+              Resource: arn:aws:s3:::${self:custom.bucket}/*
+
+    # Create a CloudFront Distribution to serve the application
+    CloudFrontDistributionWeb:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+
+          # Let the web application handle routing
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+
+          DefaultCacheBehavior:
+            ForwardedValues:
+              Cookies:
+                Forward: none
+              QueryString: false
+            TargetOriginId: Web
+            ViewerProtocolPolicy: redirect-to-https
+          DefaultRootObject: index.html
+          Enabled: true
+          HttpVersion: http2
+          Origins:
+            - DomainName: ${self:custom.bucket}.s3.amazonaws.com
+              Id: Web
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: https-only
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: true
+
+  Outputs:
+
+    # Include the domain name in the outputs to show it when running `serverless info --verbose`
+    CloudFrontDistributionDomainName:
+      Value:
+        'Fn::GetAtt': [ CloudFrontDistributionWeb, DomainName ]
