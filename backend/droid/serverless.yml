@@ -60,30 +60,6 @@ functions:
           path: droids/{id}
           method: put
           cors: true
-  color:
-    handler: control/color.color
-    events:
-      - http:
-          path: droids/color/{thingName}
-          method: post
-          cors: true
-  move:
-    handler: control/move.move
-    events:
-      - http:
-          path: droids/move/{thingName}
-          method: post
-          cors: true
-  stop:
-    handler: control/stop.stop
-    events:
-      - http:
-          path: droids/stop/{thingName}
-          method: post
-          cors: true
-      - iot:
-          sql: "SELECT topic(3) AS thingName FROM '$aws/things/+/shadow/update/accepted' WHERE state.reported.speed > 200"
-          enabled: true
 
 resources:
   Resources:
