@@ -80,7 +80,7 @@ mqttClient.onMessage((state) => {
 		shouldMove = true
 	}
 
-	if (speed === 0) {
+	if (state.hasOwnProperty("speed") && speed === 0) {
 		spheroClient.stop(() => {
 			spheroClient.setColor("white")
 		})

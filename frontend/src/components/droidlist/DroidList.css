@@ -1,0 +1,18 @@
+.droidList {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 660px;
+	padding-left: 30px;
+	padding-right: 30px;
+	position: relative;
+}
+
+.droidList:after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+.droidList > *:not(:last-child) {
+	border-bottom: 1px solid #ccc;
+}
